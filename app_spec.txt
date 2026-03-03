@@ -1,0 +1,288 @@
+# AI Agent Analytics Platform - App Specification
+
+## Overview
+
+Product analytics specifically designed for conversational AI and AI agents, showing where users struggle and drop off in AI interactions.
+
+**Problem Statement**: Traditional product analytics tools like Amplitude are designed for button-based UIs, but they don't work for conversational AI products and AI agents. Teams building AI products have no visibility into where users get confused, stuck, or frustrated during conversations. This blind spot makes it impossible to systematically improve AI agent performance and user experience.
+
+**Target Audience**: AI product teams, chatbot developers, companies building AI agents, conversational AI startups
+
+---
+
+## Tech Stack
+
+- **Frontend**: React 19 with Vite
+- **Styling**: Tailwind CSS + Shadcn/ui
+- **Backend**: FastAPI (Python 3.11+)
+- **Database**: SQLite or PostgreSQL
+- **Package Manager**: bun (frontend), uv (backend)
+- **LLM/AI**: Claude via Anthropic API (if applicable)
+
+---
+
+## Environment Setup
+
+### Prerequisites
+- Node.js 20+
+- Python 3.11+
+- bun installed globally (for frontend)
+
+### Configuration
+- Frontend dev server: port 3000
+- Backend server: port 8000
+
+Environment variables:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ANTHROPIC_API_KEY` | Yes | Claude API key for LLM functionality |
+| `DEBUG` | No | Enable debug logging (default: false) |
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────┐
+│         Frontend (React)         │
+│   ┌──────────┐  ┌──────────┐   │
+│   │  Pages   │  │Components│   │
+│   └──────────┘  └──────────┘   │
+└──────────────┬──────────────────┘
+               │ REST API
+┌──────────────┴──────────────────┐
+│         Backend (FastAPI)        │
+│   ┌──────────┐  ┌──────────┐   │
+│   │ Routes   │  │ Services │   │
+│   └──────────┘  └──────────┘   │
+└──────────────┬──────────────────┘
+               │
+┌──────────────┴──────────────────┐
+│         Database (SQLite)        │
+└─────────────────────────────────┘
+```
+
+---
+
+## Core Features
+
+### Feature 1: Project Foundation
+**Description**: Set up frontend and backend scaffolding
+
+**Requirements**:
+- Initialize React app with Vite and Tailwind CSS
+- Set up FastAPI backend with CORS
+- Create basic folder structure
+- Configure development environment
+
+**Test Steps**:
+1. Run frontend dev server → loads without errors
+2. Run backend server → responds to health check
+3. Frontend calls backend → CORS works correctly
+
+---
+
+### Feature 2: Database Setup
+**Description**: Set up database schema and models
+
+**Requirements**:
+- Define database schema (SQLite or PostgreSQL)
+- Create Pydantic models for data validation
+- Implement database connection and migrations
+- Add seed data for development
+
+**Test Steps**:
+1. Database initializes → tables created
+2. Models validate data → rejects invalid input
+3. Seed data loads → can query test records
+
+---
+
+### Feature 3: API Endpoints
+**Description**: Implement REST API endpoints for core functionality
+
+**Requirements**:
+- Create CRUD endpoints for main entities
+- Add request validation with Pydantic
+- Implement error handling
+- Document endpoints with OpenAPI
+
+**Test Steps**:
+1. Call each endpoint → returns expected response
+2. Invalid requests → return 400 with error details
+3. Access /docs → Swagger UI displays all endpoints
+
+---
+
+### Feature 4: Frontend UI Components
+**Description**: Build React components for main UI
+
+**Requirements**:
+- Create reusable UI components with Tailwind
+- Implement form handling and validation
+- Add loading and error states
+- Follow responsive design principles
+
+**Test Steps**:
+1. Components render → display correctly on desktop and mobile
+2. Forms validate → show errors for invalid input
+3. Loading states → display during async operations
+
+---
+
+### Feature 5: Frontend-Backend Integration
+**Description**: Connect frontend to backend API
+
+**Requirements**:
+- Implement API client using fetch or axios
+- Handle loading, success, and error states
+- Display data from backend in UI
+- Update UI optimistically when possible
+
+**Test Steps**:
+1. Fetch data → displays in UI correctly
+2. Create/update records → reflects in UI immediately
+3. Network errors → show user-friendly messages
+
+
+---
+
+## Data Models
+
+```python
+from pydantic import BaseModel
+from datetime import datetime
+from typing import Optional
+
+class User(BaseModel):
+    id: str
+    name: str
+    email: str
+    created_at: datetime
+
+class Item(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    description: Optional[str] = None
+    status: str
+    created_at: datetime
+```
+
+### Database Schema
+```sql
+CREATE TABLE users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE items (
+    id TEXT PRIMARY KEY,
+    user_id TEXT REFERENCES users(id),
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/health | Health check endpoint |
+| GET | /api/items | List all items |
+| POST | /api/items | Create new item |
+| GET | /api/items/:id | Get item by ID |
+| PUT | /api/items/:id | Update item |
+| DELETE | /api/items/:id | Delete item |
+
+---
+
+## File Structure
+
+```
+ai-agent-analytics-platform/
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   ├── lib/            # API client and utilities
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.ts
+├── backend/
+│   ├── main.py             # FastAPI entry point
+│   ├── routes.py           # API routes
+│   ├── models.py           # Pydantic models
+│   ├── database.py         # Database connection
+│   └── requirements.txt
+├── .env
+├── README.md
+└── init.sh                 # Startup script
+```
+
+---
+
+## UI/UX Design
+
+### Design System
+- **Theme**: Light with dark mode support
+- **Primary color**: #3B82F6 (blue)
+- **Accent color**: #10B981 (green)
+- **Background**: #FFFFFF (light) / #1F2937 (dark)
+- **Text**: #111827 (light) / #F9FAFB (dark)
+- **Font**: Inter, system-ui, sans-serif
+
+### Key Screens
+
+**Main Dashboard**
+- Clean, modern layout with card-based design
+- Responsive grid for desktop and mobile
+- Clear navigation and action buttons
+- Loading states and empty states
+
+**Detail View**
+- Full details for individual items
+- Edit and delete actions
+- Related data display
+- Breadcrumb navigation
+
+### Key Interactions
+1. User clicks create button → Form modal appears
+2. User submits form → Optimistic UI update, then API call
+3. User clicks item → Navigate to detail view
+4. User hovers over action → Tooltip appears
+
+---
+
+## Success Criteria
+
+1. Frontend and backend start without errors
+2. All API endpoints work correctly
+3. Database operations (CRUD) function properly
+4. UI is responsive on desktop and mobile
+5. No console errors during normal usage
+6. Data persists across page refresh
+7. All features match the design system
+8. init.sh starts the full application
+
+---
+
+## Constraints & Notes
+
+- This application should be built following best practices for product development
+- Code should be well-documented with docstrings
+- Follow PEP 8 style guidelines for Python code
+- Follow React best practices and hooks patterns
+- Use Tailwind CSS utility classes for styling
+- Include a README.md with setup and usage instructions
+- The init.sh script must set up the environment and start the application
+- Ensure API keys are loaded from environment variables, never hardcoded

@@ -1,0 +1,39 @@
+{
+  "project_name": "AI Agent Analytics Platform",
+  "tech_stack": {
+    "frontend": "React 19 + Vite 7.3 + TypeScript + Tailwind CSS v4",
+    "backend": "FastAPI 0.115 + Python 3.11+ + SQLite",
+    "package_managers": "npm (frontend), pip with venv (backend)"
+  },
+  "codebase_patterns": {
+    "database_access": "SQLite with @contextmanager decorator for resource management. Uses explicit commit/rollback pattern.",
+    "api_proxy": "Vite proxy config routes /api/* to http://localhost:8000 to avoid CORS in dev",
+    "tailwind_version": "Tailwind CSS v4 uses @theme directive with CSS custom properties instead of tailwind.config.js",
+    "react_patterns": "React 19 with StrictMode, functional components with hooks",
+    "typescript_strict": "tsconfig has noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch enabled",
+    "fastapi_lifespan": "Use lifespan context manager pattern (not deprecated @app.on_event)",
+    "optimistic_updates": "Create temp item with temp-{timestamp} ID, replace with real on API success, revert on error",
+    "toast_notifications": "Toast component with auto-dismiss (3s), success/error variants, slide-in animation",
+    "api_timeout": "fetchWithTimeout using AbortController, 10s default, user-friendly error messages"
+  },
+  "common_mistakes": [
+    "Do NOT use @app.on_event('startup') - use lifespan context manager instead",
+    "Always call load_dotenv() if python-dotenv is installed",
+    "CORS origins should be environment-configurable, not hardcoded",
+    "Use parameterized queries for all database operations to prevent SQL injection",
+    "Define TypeScript interfaces for all API response types",
+    "Frontend UpdateItem should NOT send user_id - backend ALLOWED_UPDATE_FIELDS excludes it",
+    "Wrap Toast onClose callbacks in useCallback to prevent unnecessary re-renders"
+  ],
+  "architecture_decisions": [
+    "Health check at /api/health for application health monitoring",
+    "Dual health endpoints: / (root info) and /api/health (health check)",
+    "Minimal dependencies approach - lean dependency tree",
+    "SQLite for development, PostgreSQL for production"
+  ],
+  "file_structure": {
+    "frontend": "frontend/src/{components,pages,lib}",
+    "backend": "backend/{main.py,routes.py,models.py,database.py}",
+    "screenshots": "screenshots/"
+  }
+}
